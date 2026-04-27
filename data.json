@@ -1,0 +1,34 @@
+{
+  "heroes":[
+    {
+      "name":"Knight",
+      "rarity":5,
+      "sprite":"https://i.imgur.com/3Wb5b9M.png",
+      "skill":"fire"
+    },
+    {
+      "name":"Mage",
+      "rarity":5,
+      "sprite":"https://i.imgur.com/8Qf6F7L.png",
+      "skill":"ice"
+    },
+    {
+      "name":"Archer",
+      "rarity":5,
+      "sprite":"https://i.imgur.com/kY3d6rP.png",
+      "skill":"electric"
+    },
+    {
+      "name":"Priest",
+      "rarity":4,
+      "sprite":"https://i.imgur.com/Tq5p9kR.png",
+      "skill":"heal"
+    },
+    {
+      "name":"Rogue",
+      "rarity":4,
+      "sprite":"https://i.imgur.com/vx7f2JQ.png",
+      "skill":"dark"
+    }
+  ]
+}
