@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Mini Genshin</title>
+
+<style>
+body{margin:0;overflow:hidden;background:#020617;color:white;font-family:sans-serif}
+canvas{display:block}
+
+/* UI */
+#top{
+position:fixed;top:0;width:100%;
+background:#0f172a;padding:10px;
+z-index:10;
+}
+
+#right{
+position:fixed;
+bottom:30px;
+right:20px;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.btn{
+width:70px;height:70px;
+border-radius:50%;
+border:none;
+background:#6366f1;
+color:white;
+font-size:20px;
+}
+
+/* joystick */
+#joy{
+position:fixed;
+bottom:30px;
+left:30px;
+width:120px;height:120px;
+background:rgba(255,255,255,0.1);
+border-radius:50%;
+}
+
+#stick{
+position:absolute;
+left:40px;top:40px;
+width:40px;height:40px;
+background:#818cf8;
+border-radius:50%;
+}
+</style>
+</head>
+
+<body>
+
+<div id="top">
+💎 Камни: <span id="gems">100</span> |
+🎭 Герой: <span id="heroName"></span>
+<button onclick="wish()">🎰 Крутка</button>
+</div>
+
+<canvas id="game"></canvas>
+
+<div id="joy"><div id="stick"></div></div>
+
+<div id="right">
+<button class="btn" onclick="atk()">⚔️</button>
+<button class="btn" onclick="skill()">E</button>
+<button class="btn" onclick="ult()">Q</button>
+</div>
+
+<script>
+
+// ===== canvas =====
+const c = document.getElementById("game")
+const ctx = c.getContext("2d")
+c.width = innerWidth
+c.height = innerHeight
+
+// ===== герои =====
+const heroes = [
+{name:"Astra",color:"violet",atk:10},
+{name:"Pyro",color:"red",atk:12},
+{name:"Cryo",color:"cyan",atk:9},
+{name:"Electro",color:"purple",atk:11},
+{name:"Geo",color:"orange",atk:13},
+{name:"Dendro",color:"green",atk:8}
+]
+
+let owned = [0]
+let current = 0
+
+// ===== валюта =====
+let gems = 100
+
+// ===== гача =====
+function wish(){
+if(gems < 10) return alert("Нет камней!")
+gems -= 10
+
+let drop = Math.random()
+if(drop < 0.3){
+let id = Math.floor(Math.random()*heroes.length)
+owned.push(id)
+alert("🎉 Новый герой: " + heroes[id].name)
+}else{
+alert("⭐ Не повезло")
+}
+}
+
+// ===== игрок =====
+let p = {x:200,y:200,s:40}
+
+// ===== босс =====
+let boss = {x:700,y:300,hp:300,name:"Дракон Пустоты"}
+
+// ===== эффекты =====
+let fx = []
+function effect(x,y,c){
+fx.push({x,y,s:10,life:20,color:c})
+}
+
+// ===== атаки =====
+function atk(){
+boss.hp -= heroes[current].atk
+effect(boss.x,boss.y,"yellow")
+}
+
+function skill(){
+boss.hp -= heroes[current].atk*2
+effect(boss.x,boss.y,"blue")
+}
+
+function ult(){
+boss.hp -= heroes[current].atk*4
+effect(boss.x,boss.y,"purple")
+}
+
+// ===== джойстик =====
+let joyX=0, joyY=0, drag=false
+
+const joy = document.getElementById("joy")
+const stick = document.getElementById("stick")
+
+joy.addEventListener("touchstart", ()=>drag=true)
+
+document.addEventListener("touchmove", e=>{
+if(!drag) return
+
+let r = joy.getBoundingClientRect()
+let x = e.touches[0].clientX - r.left - 60
+let y = e.touches[0].clientY - r.top - 60
+
+let d = Math.sqrt(x*x+y*y)
+if(d>40){x=x/d*40;y=y/d*40}
+
+stick.style.left = (x+60-20)+"px"
+stick.style.top = (y+60-20)+"px"
+
+joyX = x/40
+joyY = y/40
+})
+
+document.addEventListener("touchend", ()=>{
+drag=false
+joyX=joyY=0
+stick.style.left="40px"
+stick.style.top="40px"
+})
+
+// ===== игра =====
+function loop(){
+
+// движение
+p.x += joyX*5
+p.y += joyY*5
+
+ctx.fillStyle="#020617"
+ctx.fillRect(0,0,c.width,c.height)
+
+// карта
+for(let i=0;i<50;i++){
+ctx.fillStyle="#022c22"
+ctx.fillRect(i*200,400,150,100)
+}
+
+// игрок
+ctx.fillStyle=heroes[current].color
+ctx.fillRect(p.x,p.y,40,40)
+
+// босс
+ctx.fillStyle="red"
+ctx.fillRect(boss.x,boss.y,80,80)
+
+// эффекты
+fx.forEach((e,i)=>{
+ctx.fillStyle=e.color
+ctx.beginPath()
+ctx.arc(e.x,e.y,e.s,0,Math.PI*2)
+ctx.fill()
+e.s+=1
+e.life--
+if(e.life<=0) fx.splice(i,1)
+})
+
+// UI
+document.getElementById("gems").innerText = gems
+document.getElementById("heroName").innerText = heroes[current].name
+
+ctx.fillStyle="white"
+ctx.fillText("Босс: "+boss.name,20,50)
+ctx.fillText("HP: "+boss.hp,20,70)
+
+requestAnimationFrame(loop)
+}
+
+loop()
+
+</script>
+</body>
+</html>
