@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Pixel Gacha RPG</title>
+
+<style>
+body{margin:0;background:#020617;color:white;font-family:sans-serif;overflow:hidden}
+
+/* верх */
+#top{
+position:fixed;
+top:0;
+width:100%;
+background:#0f172a;
+padding:10px;
+display:flex;
+justify-content:space-between;
+z-index:10
+}
+
+.btn{
+background:#6366f1;
+border:none;
+color:white;
+padding:6px;
+border-radius:8px;
+}
+
+/* панели */
+.panel{
+position:fixed;
+top:60px;
+background:#1e293b;
+padding:10px;
+border-radius:10px;
+display:none;
+}
+
+#inv{left:10px}
+#heroes{left:200px}
+#banner{right:10px}
+
+.card{
+background:#0f172a;
+padding:6px;
+margin:5px;
+border-radius:6px;
+cursor:pointer;
+}
+
+canvas{display:block}
+</style>
+</head>
+
+<body>
+
+<div id="top">
+<div>💎 <span id="gems"></span></div>
+<div>
+<button class="btn" onclick="toggle('inv')">🎒</button>
+<button class="btn" onclick="toggle('heroes')">👤</button>
+<button class="btn" onclick="toggle('banner')">🎰</button>
+</div>
+</div>
+
+<div id="inv" class="panel"></div>
+<div id="heroes" class="panel"></div>
+<div id="banner" class="panel">
+<button onclick="wish()">Крутить</button>
+<div id="log"></div>
+</div>
+
+<canvas id="game"></canvas>
+
+<script src="game.js"></script>
+</body>
+</html>
