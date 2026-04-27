@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Gacha Game PRO</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+}
+#top{
+    background:#1e293b;
+    padding:10px;
+}
+button{
+    padding:10px;
+    margin:5px;
+    border:none;
+    border-radius:8px;
+    background:#6366f1;
+    color:white;
+    cursor:pointer;
+}
+#heroes{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+.card{
+    width:120px;
+    background:#1e293b;
+    margin:5px;
+    padding:5px;
+    border-radius:10px;
+}
+img{
+    width:100%;
+    border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="top">
+💰 Gold: <span id="gold">1000</span>
+<button onclick="roll()">🎰 Roll</button>
+<button onclick="toggleMusic()">🔊 Music</button>
+</div>
+
+<h2>🌍 Location: <span id="location">Forest</span></h2>
+<button onclick="move('Forest')">Forest</button>
+<button onclick="move('City')">City</button>
+<button onclick="move('Dungeon')">Dungeon</button>
+
+<div id="heroes"></div>
+
+<!-- 🎵 МУЗЫКА -->
+<audio id="mainMusic" loop src="music-main.mp3"></audio>
+<audio id="townMusic" loop src="music-town.mp3"></audio>
+<audio id="battleMusic" loop src="music-battle.mp3"></audio>
+
+<!-- 🔊 ЭФФЕКТЫ -->
+<audio id="click" src="click.mp3"></audio>
+<audio id="legend" src="legend.mp3"></audio>
+
+<script>
+
+// ===== ДАННЫЕ =====
+const pool = []
+for(let i=1;i<=60;i++){
+    pool.push({
+        name:"Hero "+i,
+        img:"https://via.placeholder.com/100?text=H"+i
+    })
+}
+
+let gold = 1000
+let owned = []
+let musicOn = false
+let currentMusic = null
+
+// ===== ЗВУК =====
+function play(id){
+    let s = document.getElementById(id)
+    s.currentTime = 0
+    s.play()
+}
+
+function stopAllMusic(){
+    ["mainMusic","townMusic","battleMusic"].forEach(id=>{
+        document.getElementById(id).pause()
+    })
+}
+
+function switchMusic(id){
+    if(!musicOn) return
+
+    stopAllMusic()
+
+    let m = document.getElementById(id)
+    m
