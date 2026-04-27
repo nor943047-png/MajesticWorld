@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Moon RPG Mobile</title>
+
+<style>
+body{margin:0;overflow:hidden;background:#020617;font-family:sans-serif;color:white}
+
+/* UI */
+#ui{position:fixed;top:0;width:100%;padding:10px;background:#0f172a;z-index:10}
+
+/* Джойстик */
+#joystick{
+position:fixed;
+bottom:40px;
+left:40px;
+width:120px;height:120px;
+background:rgba(255,255,255,0.1);
+border-radius:50%;
+}
+
+#stick{
+position:absolute;
+left:40px;top:40px;
+width:40px;height:40px;
+background:#6366f1;
+border-radius:50%;
+}
+
+/* Кнопки */
+#buttons{
+position:fixed;
+bottom:40px;
+right:40px;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.btn{
+width:70px;height:70px;
+border-radius:50%;
+border:none;
+font-size:20px;
+background:#6366f1;
+color:white;
+}
+
+/* герой */
+canvas{display:block}
+</style>
+</head>
+
+<body>
+
+<div id="ui">
+Герой: <span id="hero"></span>
+</div>
+
+<canvas id="game"></canvas>
+
+<!-- Джойстик -->
+<div id="joystick">
+  <div id="stick"></div>
+</div>
+
+<!-- Кнопки -->
+<div id="buttons">
+<button class="btn" onclick="attack()">⚔️</button>
+<button class="btn" onclick="skill()">E</button>
+<button class="btn" onclick="ult()">Q</button>
+</div>
+
+<script>
+
+// canvas
+const canvas = document.getElementById("game")
+const ctx = canvas.getContext("2d")
+canvas.width = innerWidth
+canvas.height = innerHeight
+
+// герои
+const heroes = [
+{name:"Astra",color:"violet",atk:10},
+{name:"Luna",color:"cyan",atk:8},
+{name:"Noctis",color:"black",atk:12}
+]
+
+let hero = 0
+
+// игрок
+let player = {x:200,y:200,size:40,speed:3}
+
+// босс
+let boss = {x:600,y:300,hp:300}
+
+// эффекты
+let effects = []
+
+function fx(x,y,c){
+effects.push({x,y,size:10,life:20,color:c})
+}
+
+// атаки
+function attack(){
+boss.hp -= heroes[hero].atk
+fx(boss.x,boss.y,"yellow")
+}
+
+function skill(){
+boss.hp -= heroes[hero].atk*2
+fx(boss.x,boss.y,"blue")
+}
+
+function ult(){
+boss.hp -= heroes[hero].atk*4
+fx(boss.x,boss.y,"purple")
+}
+
+// ===== ДЖОЙСТИК =====
+const joystick = document.getElementById("joystick")
+const stick = document.getElementById("stick")
+
+let dragging = false
+let joyX = 0
+let joyY = 0
+
+joystick.addEventListener("touchstart", e=>{
+dragging = true
+})
+
+document.addEventListener("touchmove", e=>{
+if(!dragging) return
+
+let rect = joystick.getBoundingClientRect()
+let x = e.touches[0].clientX - rect.left - 60
+let y = e.touches[0].clientY - rect.top - 60
+
+let dist = Math.sqrt(x*x+y*y)
+if(dist > 40){
+x = x/dist*40
+y = y/dist*40
+}
+
+stick.style.left = (x+60-20)+"px"
+stick.style.top = (y+60-20)+"px"
+
+joyX = x/40
+joyY = y/40
+})
+
+document.addEventListener("touchend", ()=>{
+dragging = false
+joyX = 0
+joyY = 0
+stick.style.left = "40px"
+stick.style.top = "40px"
+})
+
+// ===== LOOP =====
+function loop(){
+
+// движение
+player.x += joyX * player.speed * 5
+player.y += joyY * player.speed * 5
+
+ctx.fillStyle="#020617"
+ctx.fillRect(0,0,canvas.width,canvas.height)
+
+// игрок
+ctx.fillStyle = heroes[hero].color
+ctx.fillRect(player.x,player.y,40,40)
+
+// босс
+ctx.fillStyle="red"
+ctx.fillRect(boss.x,boss.y,80,80)
+
+// эффекты
+effects.forEach((e,i)=>{
+ctx.fillStyle=e.color
+ctx.beginPath()
+ctx.arc(e.x,e.y,e.size,0,Math.PI*2)
+ctx.fill()
+e.size++
+e.life--
+if(e.life<=0) effects.splice(i,1)
+})
+
+// UI
+document.getElementById("hero").innerText = heroes[hero].name
+
+ctx.fillStyle="white"
+ctx.fillText("HP: "+boss.hp,20,50)
+
+requestAnimationFrame(loop)
+}
+
+loop()
+
+</script>
+</body>
+</html>
